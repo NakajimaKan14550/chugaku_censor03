@@ -3,712 +3,603 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高速イメージング・ソリューション | クロニクス株式会社</title>
+    <title>超高速CMOSイメージセンサ＆外部ADコンバータ技術解説 | クロニクス株式会社</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Base Reset & Variables */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         :root {
-            --main-color: #091a2d;
-            --accent-color: #f97316;
-            --bg-color: #f8fafc;
-            --text-color: #1e293b;
-            --footer-text: #cbd5e1;
+            --color-main: #091a2d;
+            --color-accent: #f97316;
+            --color-bg: #f8fafc;
+            --color-text: #1e293b;
+            --color-muted: #64748b;
+            --color-white: #ffffff;
+            --max-width: 1200px;
+            --header-height: 70px;
         }
 
         body {
             font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        a {
-            color: var(--accent-color);
-            text-decoration: none;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Navigation */
-        nav {
-            background-color: var(--main-color);
-            padding: 1rem 2rem;
-            position: fixed;
-            width: 100%;
+        .navbar {
+            background-color: var(--color-main);
+            padding: 15px 20px;
+            position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        nav img {
-            height: 40px;
-        }
-
-        /* Hero */
-        #hero {
-            background-color: var(--main-color);
-            color: white;
-            padding: 100px 2rem 60px;
-            text-align: center;
-        }
-
-        #hero img {
-            height: 60px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin: 0 0 10px;
-        }
-
-        #hero p {
-            font-size: 1.2rem;
-            opacity: 0.8;
-            max-width: 800px;
+        .navbar-container {
+            max-width: var(--max-width);
             margin: 0 auto;
-        }
-
-        /* Sections */
-        section {
-            padding: 60px 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h2 {
-            font-size: 2rem;
-            color: var(--main-color);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
-
-        h3 {
-            color: var(--main-color);
-            margin-top: 30px;
-        }
-
-        p {
-            margin-bottom: 15px;
-        }
-
-        /* Grid */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            display: flex;
             align-items: center;
         }
-
-        /* Sensor Table Styling */
-        .sensor-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        .logo-link {
+            display: inline-block;
         }
-
-        .sensor-table th, .sensor-table td {
-            border: 1px solid #e2e8f0;
-            padding: 15px;
-            text-align: left;
-        }
-
-        .sensor-table th {
-            background-color: #e2e8f0;
-            color: var(--main-color);
-            font-weight: bold;
-        }
-
-        .model-name {
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        /* Image Zoom */
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            cursor: zoom-in;
-            transition: all 0.3s ease;
-        }
-
-        img.zoomed {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(2.5);
-            z-index: 2000;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            cursor: zoom-out;
-        }
-
-        #zoom-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1500;
-        }
-
-        #zoom-overlay.active {
+        .logo-img {
+            height: 40px;
+            width: auto;
             display: block;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            section { padding: 40px 1rem; }
-            img.zoomed { transform: translate(-50%, -50%) scale(1.5); }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="zoom-overlay"></div>
-
-    <nav>
-        <a href="https://nakajimakan14550.github.io/home/"><img src="logo.png" alt="Chronix Logo"></a>
-    </nav>
-
-    <header id="hero">
-        <img src="logo.png" alt="Chronix Logo">
-        <h1>究極の高速イメージング技術：センサーとADコンバータの物理的限界へ</h1>
-        <p>産業用・研究用高速カメラシステムにおける、画質、スピード、そしてデータの物理的トレードオフを論理的に解説。なぜ専用ADコンバータが必要とされるのか。</p>
-    </header>
-
-    <section id="introduction">
-        <h2>【背景】高速化における物理的限界とAD変換の真実</h2>
-        <div class="grid-2">
-            <div>
-                <p>高速イメージングの世界では、物理法則に基づいた厳格なトレードオフが存在します。全てのイメージセンサー（光電変換素子）は、受け取った光（アナログ信号）をデジタルデータ（0と1）に変換する「ADコンバータ」機能を必ず内蔵、あるいは併設しています。</p>
-                <p>一般的なスマートフォンやカメラのセンサーでは、コストとサイズの制約から、このADコンバータがイメージセンサーと同じシリコンチップ上に「内蔵」されています。これを「オンチップADコンバータ」と呼びます。</p>
-                <p>オンチップ方式は非常に効率的ですが、高速化（高フレームレート化）を進めると、AD変換に伴う発熱が増加し、それがセンサーの熱ノイズとなります。また、ADコンバータの処理能力自体がチップ全体のボトルネックとなり、物理的な限界に達します。</p>
-            </div>
-            <img src="image_3.png" alt="ADコンバータ配置の解説図（オンチップと外部配置の比較）">
-        </div>
-    </section>
-
-    <section id="speed-limit">
-        <h2>【解決策】ADコンバータの「外部配置」による限界突破</h2>
-        <div class="grid-2">
-            <img src="image_1.png" alt="高速化のための画素数・画素サイズ・フレームレートの解説図">
-            <div>
-                <h3>1. 熱問題の解決</h3>
-                <p>高速イメージングでは、1秒間に数千～数万回、膨大なデータをデジタル化する必要があります。この処理には巨大な電力が必要で、比例して莫大な熱が発生します。ADコンバータをセンサーチップの外に「別部品」として分離することで、熱源を物理的に遠ざけ、センサー自体の温度上昇を抑えます。これにより、熱ノイズを低減し、高画質な高速撮影が可能になります。</p>
-                <h3>2. 処理速度の限界突破</h3>
-                <p>オンチップADコンバータの処理能力には物理的な限界があります（「レジ（受付窓口）」がパンクする状態）。外部に専用の高性能ADコンバータを配置することで、センサーが超高速で生成するアナログデータを、遅延なくデジタル信号に変換できます。</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="sensor-performance">
-        <h2>【技術原理】イメージセンサー「6人の個性派アスリート」の特徴</h2>
-        <p>高速カメラシステムでは、用途に合わせて異なる物理特性を持つセンサーを使い分けます。下表は、解像度（画素数）、スピード（フレームレート）、集光力（画素サイズ）のトレードオフを数値で示しています。右に行くほど解像度を犠牲にし、スピードと集光力を極めています。</p>
-        
-        <table class="sensor-table">
-            <thead>
-                <tr>
-                    <th>型番</th>
-                    <th>キャラクター</th>
-                    <th>解像度（画素数）</th>
-                    <th>スピード（フレームレート）</th>
-                    <th>画素サイズ / 集光力</th>
-                    <th>産業的インパクト・主な用途</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="model-name">LUX8M</td>
-                    <td>Balanced Ace（バランスエース）</td>
-                    <td>8.5MP（約850万画素）</td>
-                    <td>250 fps (4K)</td>
-                    <td>4Kに近い高画質</td>
-                    <td>高解像度と速度のバランスが求められる、精密機器検査、メディア制作。</td>
-                </tr>
-                <tr>
-                    <td class="model-name">LUX2100</td>
-                    <td>Full HD Speedster（フルHDスピードスター）</td>
-                    <td>2.1MP（約210万画素）</td>
-                    <td>1000 fps (Full HD)</td>
-                    <td>10µm（大きめ、集光力強）</td>
-                    <td>Full HD解像度での超高速撮影。暗所での撮影に対応、自動車衝突実験、スポーツ解析。</td>
-                </tr>
-                <tr>
-                    <td class="model-name">LUX1310 & LUX1310S</td>
-                    <td>Twin Pairs（ツインペアーズ）</td>
-                    <td>1.3MP（約130万画素）</td>
-                    <td>1310: 1070 fps<br>1310S: 267 fps</td>
-                    <td>-</td>
-                    <td>1310は実力派、1310Sは省エネ・コンパクト。機械への組み込み、汎用高速ライン監視。</td>
-                </tr>
-                <tr>
-                    <td class="model-name">LUX330</td>
-                    <td>Explosive Speed King (Flyer Star!)（爆発的スピードキング）</td>
-                    <td>0.33MP（約33万画素）</td>
-                    <td>4168 fps</td>
-                    <td>-</td>
-                    <td>解像度を大幅に抑え、究極のスピードを追求。エンジンの爆発、弾丸、破壊現象の瞬間計測。</td>
-                </tr>
-                <tr>
-                    <td class="model-name">LUX13HS</td>
-                    <td>Dark Hunter（ダークハンター）</td>
-                    <td>1.1MP（約110万画素）</td>
-                    <td>3500 fps</td>
-                    <td>13.7µm（最大、集光力最強）</td>
-                    <td>「光を集める能力」を最大化。暗い実験室や、極短時間露光が必要な、顕微鏡撮影、化学反応解析。</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div style="text-align: center; margin-top: 40px;">
-            <img src="image_0.png" alt="イメージセンサー製品群のキャラクター解説図">
-        </div>
-    </section>
-
-    <section id="ad-converter">
-        <h2>【技術原理】ADコンバータ「2人の天才通訳」の特徴</h2>
-        <div class="grid-2">
-            <div>
-                <p>イメージセンサーが生成する高速アナログデータを処理するには、それに匹敵する超高速なADコンバータが必要です。ADコンバータの性能は、「分解能（諧調数）」「チャンネル数（データの並列性）」「サンプリングレート（1秒間の処理回数）」で決定されます。</p>
-                
-                <table class="sensor-table">
-                    <thead>
-                        <tr>
-                            <th>型番</th>
-                            <th>キャラクター</th>
-                            <th>チャンネル数（並列処理数）</th>
-                            <th>サンプリングレート（処理速度）</th>
-                            <th>分解能（諧調）</th>
-                            <th>産業的インパクト・主な用途</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="model-name">LUXA1680</td>
-                            <td>Smart and Practical（スマート＆プラクティカル）</td>
-                            <td>16 ch</td>
-                            <td>80M sps (8000万回/秒)</td>
-                            <td>-</td>
-                            <td>バランスの良い性能。カメラを小型に設計したい場合に最適。汎用高速カメラ、医療機器。</td>
-                        </tr>
-                        <tr>
-                            <td class="model-name">LUXA3280</td>
-                            <td>Mega Monster Register（メガ・モンスター・レジ）</td>
-                            <td>32 ch</td>
-                            <td>90M sps (9000万回/秒)🚀 【究極版】技術広報・Webエンジニアとして、お預かりした画像と情報に基づき、論理的で信頼性の高い「特設ソリューションサイト」のHTMLコードを出力します。
-
-このHTMLファイルは、単体で完結するレスポンシブデザインであり、ご要望の画像拡大（トグル）機能と、必須のフッターを完結しています。
-
-### 📄 出力成果物：単一 HTML ファイル
-
-以下のコードを `solution.html` などの名前で保存し、同一フォルダに提供された画像（`logo.png`, `image_0.png`, `image_1.png`, `image_2.png`, `image_3.png`）を配置してブラウザで開いてください。
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高速イメージング・ソリューション | クロニクス株式会社</title>
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css)">
-    <style>
-        /* 1. デザイン・UI規定のCSS変数 */
-        :root {
-            --main-color: #091a2d;
-            --accent-color: #f97316;
-            --bg-color: #f8fafc;
-            --text-color: #1e293b;
-            --footer-text: #cbd5e1;
-            --header-height: 70px;
-        }
-
-        /* Base Styles */
-        body {
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            scroll-behavior: smooth;
-        }
-
-        /* 共通レイアウト: Grid */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        section {
-            padding: 60px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        h1, h2, h3 {
-            color: var(--main-color);
-            font-weight: bold;
-        }
-
-        p {
-            margin-bottom: 1.5em;
-        }
-
-        /* ナビゲーション */
-        header {
-            background: rgba(9, 26, 45, 0.95);
-            color: #fff;
-            height: var(--header-height);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .logo-link {
-            display: flex;
-            align-items: center;
-        }
-
-        /* 左上に logo.png を配置 */
-        .logo-link img {
-            height: 40px;
-            width: auto;
-        }
-
-        /* ヒーローエリア */
+        /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #091a2d 0%, #1a3a5f 100%);
-            color: #fff;
-            padding: calc(var(--header-height) + 80px) 0 80px 0;
+            background: linear-gradient(135deg, #0f2b48 0%, var(--color-main) 100%);
+            color: var(--color-white);
+            padding: 80px 20px;
             text-align: center;
         }
-
-        .hero-content {
+        .hero-container {
+            max-width: 800px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
         }
-
-        /* メインタイトルの直近に logo.png を配置 */
         .hero-logo {
             height: 60px;
             width: auto;
+            margin-bottom: 20px;
+        }
+        .hero-category {
+            background-color: var(--color-accent);
+            color: var(--color-white);
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+        .hero-lead {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .hero h1 {
-            color: #fff;
-            font-size: 2.5rem;
-            margin: 0;
-            letter-spacing: -0.02em;
+        /* Main Layout */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 60px 20px;
         }
 
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--footer-text);
-            max-width: 800px;
-            margin-top: 20px;
+        /* Section Styling */
+        section {
+            background-color: var(--color-white);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
         }
-
-        /* Section Specifics */
+        
         .section-title {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 50px;
-            position: relative;
+            font-size: 1.6rem;
+            color: var(--color-main);
+            margin-bottom: 30px;
             padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
         }
-
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: -2px;
+            left: 0;
             width: 60px;
-            height: 4px;
-            background-color: var(--accent-color);
+            height: 2px;
+            background-color: var(--color-accent);
         }
 
-        .grid-2 {
+        /* Grid Layouts */
+        .grid-2col {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 40px;
+            align-items: start;
+        }
+
+        /* Dialogue Box (Q&A Interface) */
+        .qa-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .dialogue-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .dialogue-row.student {
+            flex-direction: row;
+        }
+        .dialogue-row.engineer {
+            flex-direction: row-reverse;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e2e8f0;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .dialogue-row.student .avatar {
+            background-color: #e0f2fe;
+        }
+        .dialogue-row.engineer .avatar {
+            background-color: #ffedd5;
+        }
+        .bubble {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            position: relative;
+            font-size: 0.95rem;
+        }
+        .dialogue-row.student .bubble {
+            background-color: #f1f5f9;
+            color: var(--color-text);
+            border-top-left-radius: 2px;
+        }
+        .dialogue-row.engineer .bubble {
+            background-color: var(--color-main);
+            color: var(--color-white);
+            border-top-right-radius: 2px;
+        }
+        .bubble strong {
+            color: var(--color-accent);
+        }
+        .dialogue-row.student .bubble strong {
+            color: var(--color-main);
+        }
+        .speaker-name {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--color-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .dialogue-row.engineer .speaker-name {
+            text-align: right;
+            color: #94a3b8;
         }
 
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(30%, 1fr));
-            gap: 30px;
+        /* Thought box inside dialogue */
+        .thought-quote {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid var(--color-accent);
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            border-radius: 0 4px 4px 0;
         }
 
-        .card {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+        /* List styling inside engineering dialogue */
+        .tech-list {
+            list-style: none;
+            margin-top: 10px;
+            padding-left: 0;
+        }
+        .tech-list li {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        .tech-list li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+            font-weight: bold;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
+        /* Technical Commentary Panel */
+        .tech-panel {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--color-main);
+            padding: 25px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .tech-panel h4 {
+            font-size: 1.1rem;
+            color: var(--color-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tech-panel h4::before {
+            content: '■';
+            color: var(--color-accent);
+            font-size: 0.8rem;
+        }
+        .tech-panel p {
+            font-size: 0.9rem;
+            color: #334155;
         }
 
-        .card h3 {
-            margin-top: 0;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+        /* Editorial Note */
+        .editorial-note {
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #475569;
         }
 
-        .model-number {
-            font-family: monospace;
-            background: #e2e8f0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.9em;
+        /* Image Zoom Styles */
+        .img-container {
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
         }
-
-        /* 2. 画像拡大仕様（Simple Zoom） */
-        img {
+        .zoomable-image {
             max-width: 100%;
             height: auto;
             border-radius: 4px;
-            /* 必須規定 */
             cursor: zoom-in;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        /* 拡大時のクラス */
-        img.zoomed {
+        
+        /* Zoom Overlay Class Controlled by JS */
+        .zoomable-image.zoomed {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(1.5);
+            transform: translate(-50%, -50%) scale(1.0);
             z-index: 2000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            /* 必須規定 */
-            cursor: zoom-out;
+            max-width: 95vw;
             max-height: 90vh;
-            border: 4px solid #fff;
+            object-fit: contain;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            cursor: zoom-out;
+            border: 4px solid var(--color-white);
         }
-
-        /* 拡大時の背景オーバーレイ */
-        #zoom-overlay {
-            display: none;
+        .zoom-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(9, 26, 45, 0.85);
             z-index: 1999;
-            cursor: zoom-out;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .zoom-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        #zoom-overlay.active {
-            display: block;
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            .bubble {
+                max-width: 90%;
+            }
         }
-
-        /* 特徴テーブル */
-        .feature-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 0.9rem;
-        }
-
-        .feature-table th, .feature-table td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .feature-table th {
-            color: var(--main-color);
-            background-color: #f1f5f9;
-        }
-
-        /* Footer Style Override from Prompt */
-        .company-name, .footer-address, .contact-grid, .btn-contact {
-            /* Strict neutrality applied via prompt requirements, just inlining styles */
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 1.8rem; }
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            img.zoomed {
-                transform: translate(-50%, -50%) scale(1.0);
-                width: 90%;
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+            .avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="zoom-overlay"></div>
+    <div class="zoom-overlay" id="zoomOverlay"></div>
 
-    <header>
-        <div class="container nav-container">
-            <a href="[https://nakajimakan14550.github.io/home/](https://nakajimakan14550.github.io/home/)" class="logo-link">
-                <img src="logo.png" alt="Chronix Logo">
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="https://nakajimakan14550.github.io/home/" class="logo-link">
+                <img src="logo.png" alt="CHRONIX" class="logo-img">
             </a>
-            <nav>
-                </nav>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-container">
+            <img src="logo.png" alt="CHRONIX" class="hero-logo">
+            <div class="hero-category">Technical Commentary</div>
+            <h1 class="hero-title">教えてエンジニアさん！ハイスピードカメラとADコンバータの配置における物理限界</h1>
+            <p class="hero-lead">「すべてのセンサーはアナログをデジタルに変えているのではないか？」という疑問に基づき、超高速イメージングが抱える構造的な熱限界と分散処理の論理を解説します。</p>
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container hero-content">
-            <img src="logo.png" alt="Chronix Logo" class="hero-logo">
-            <h1>物理的トレードオフを論理的に解く。<br>高速イメージング・ソリューション</h1>
-            <p>イメージセンサーの「光電変換」と、ADコンバータの「量子化」。産業用高速撮影において、これら２つの物理現象が抱える限界と、その解決策を解説します。</p>
-        </div>
-    </section>
+    <main class="container">
 
-    <section id="problem">
-        <div class="container">
-            <h2 class="section-title">【背景】高速化の物理的限界</h2>
-            <div class="grid-2">
-                <div>
-                    <h3>全てのセンサーは「アナログ」を「デジタル」に変換しているのではないか？</h3>
-                    <p>
-                        <strong>技術的事実として、その通りです。</strong> 光学センサー（イメージセンサー）は、受光した光信号（アナログフォトン）を電子信号（アナログ電圧）に変換し、最終的に「ADコンバータ」によってデジタルデータ（0と1）へ量子化します。
-                    </p>
-                    <p>
-                        課題は、<strong>「どこで」その変換を行うか</strong>です。
-                    </p>
-                    <p>
-                        一般的なスマートフォンやコンシューマ向けカメラでは、コストとサイズの最適化のため、ADコンバータはセンサーチップ内部に「内蔵」されています。しかし、超高速撮影においては、この「内蔵（オンチップ）方式」が物理的なボトルネックとなります。
-                    </p>
+        <section id="qa-1">
+            <h2 class="section-title">【背景】スマホのカメラと高速センサーの根本的な構造差</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            お兄さん、これ何？『CMOSイメージセンサ』って？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            データシートだよ！ゼロから教えるね。レンズから入ってきた光を電気の信号に変える、カメラの網膜・フィルムのようなものなんだ。でも、スマホ用じゃない。プロ用超高速カメラの部品なんだ。
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            スマホのカメラとは何が違うんですか？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            普通のスマホセンサーは、画素データを1列ずつ順番に送り出すから、1枚完成するのに時間がかかるんだ（普通の1車線道路）。対して、高速センサー（ラクシマ）は、全画素に大量の出口があって、いっせいデータを送り出す。これが<strong>「超並列処理」</strong>（超巨大な高速道路）なんだよ。
+                        </div>
+                    </div>
                 </div>
-                <img src="image_3.png" alt="ADコンバータの配置比較：オンチップと外部配置">
-            </div>
-        </div>
-    </section>
-
-    <section id="solution" style="background-color: #fff;">
-        <div class="container">
-            <h2 class="section-title">【解決策】ADコンバータの物理的分離</h2>
-            <div class="grid-2">
-                <img src="image_1.png" alt="高速センサーの3大要素：解像度、画素サイズ、フレームレート">
-                <div>
-                    <h3>なぜ「別々」にする必要があるのか？</h3>
-                    <p>
-                        超ハイスピード撮影では、1秒間に数千、数万枚もの画像データを処理する必要があります。この膨大な「量子化処理」をセンサーチップ内部で行うと、2つの重大な物理的課題が発生します。
-                    </p>
-                    <ol>
-                        <li><strong>発熱（熱ノイズ）：</strong> ADコンバータの高頻度動作は莫大な熱を生みます。センサーチップが自己発熱すると、それが「熱ノイズ」となり、画質を劇的に低下させます。</li>
-                        <li><strong>処理速度（帯域）：</strong> センサーチップ内の限られた配線スペースでは、生成された膨大なデジタルデータを遅延なく外部へ転送する「帯域」が不足します。</li>
-                    </ol>
-                    <p>
-                        クロニクスのソリューションは、このADコンバータをセンサーチップから物理的に分離し、専用部品として外部に配置します。これにより、センサーの発熱を抑え、かつ専用の広帯域データバスによって、物理限界までの高速処理を可能にします。
-                    </p>
+                <div class="tech-panel">
+                    <div>
+                        <h4>技術原理：データ転送帯域の課題</h4>
+                        <p>一般的なイメージセンサはシリアル転送に近い走査方式を採用しますが、数千fpsを超える高速撮影では、配線の物理的限界（寄生容量やクロック同期制限）により、シングルチャネルでの転送は不可能です。</p>
+                        <p>超高速センサにおいては、数画素～数十画素ごとに完全に独立した出力パス（超巨大な高速道路構造）をマトリクス状に配置し、並列で同時出力を行う「マルチチャネル・パラレル読み出し構造」が必須となります。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="lux1.png" alt="CMOSイメージセンサの原理と超並列処理の構造差" class="zoomable-image">
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="models">
-        <div class="container">
-            <h2 class="section-title">高速イメージング・コンポーネント</h2>
-            <p style="text-align: center; max-width: 700px; margin: 0 auto 50px auto;">お客様の求める「解像度、集光力、スピード」のトレードオフに基づき、最適なコンポーネントを選択可能です。</p>
-            
-            <h3>■ 6人の個性派アスリート（イメージセンサー編）</h3>
-            <div class="grid-3">
-                <div class="card">
-                    <h3>Balanced Ace <span class="model-number">LUX8M</span></h3>
-                    <p>4Kに近い高解像度（8.5MP）を維持しつつ、250fpsの高速性を両立。画質と速度のバランスを重視する用途に。</p>
+        <section id="qa-2">
+            <h2 class="section-title">【物理的限界】解像度・画素サイズ・フレームレートのトレードオフ</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            本当だ、でもスマホより高速カメラの方が画素数が少ないのはなぜ？画質が悪いの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            画素数が多すぎると、大渋滞が起きちゃうんだ。いくら高速道路の車線が多くても、何千万台もの車がいっせいに走ったら動けなくなるでしょ？だから画素数を少なくして渋滞を防ぐんだ。超ハイスピード撮影のためには、<strong>1枚あたりのデータの重さを軽くする必要がある</strong>んだよ。
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            なるほど。じゃあこの「&mu;m（マイクロメートル）」って何ですか？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            画素サイズ、つまり「光を受けるお部屋」の広さだよ。1ミリの1000分の1の単位。部屋が広い（画素サイズが大きい）ほど、短時間でたくさんの光を集められるんだ。5&mu;mだと少しだけど、13.7&mu;m（LUX13HS）ならたくさんの光を集められる。だから暗い場所でもキレイに撮れるんだ。
+                        </div>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Full HD Speedster <span class="model-number">LUX2100</span></h3>
-                    <p>Full HD（2.1MP）解像度で1000fpsを達成。10&micro;mの大型画素により集光力も高く、暗所での超高速撮影に対応。</p>
-                </div>
-                <div class="card">
-                    <h3>Twin Pairs <span class="model-number">LUX1310/1310S</span></h3>
-                    <p>1.3MPの1インチセンサー。1070fpsの実力派(1310)と、省エネ・コンパクト(1310S)の姉妹モデル。</p>
-                </div>
-                <div class="card">
-                    <h3>Explosive Speed King <span class="model-number">LUX330</span></h3>
-                    <p>0.33MP（VGAクラス）まで解像度を抑えることで、4168fpsという圧倒的な爆発的スピードを追求。</p>
-                </div>
-                <div class="card">
-                    <h3>Dark Hunter <span class="model-number">LUX13HS</span></h3>
-                    <p>1.1MPセンサー。13.7&micro;mという最大級の画素サイズにより集光力を極限まで高め、暗い実験室でもクッキリ撮影。</p>
+                <div class="tech-panel">
+                    <div>
+                        <h4>数理ロジック：スループット限界と集光能力</h4>
+                        <p>センサが出力可能な最大総データレート（スループット）は以下の物理方程式に支配されます。</p>
+                        <p style="font-family: monospace; background: #e2e8f0; padding: 8px; border-radius: 4px; text-align: center; margin: 8px 0;">データレート = 画素数 &times; フレームレート &times; 階調ビット数</p>
+                        <p>系の限界転送速度が一定である以上、フレームレート（fps）を極限まで高めるには画素数（解像度）を削減せざるを得ません。また、シャッタースピードがμsオーダーに達するため、1画素あたりの受光面積（画素サイズ）を拡大し、量子効率を補う必要があります。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="lux2.png" alt="解像度、画素サイズ、フレームレートの相互関係と物理的ボトルネック" class="zoomable-image">
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div style="text-align: center; margin-top: 40px;">
-                <img src="image_0.png" alt="イメージセンサー型番別の特徴とキャラクター解説">
-            </div>
-
-            <h3 style="margin-top: 60px;">■ 2人の天才通訳（ADコンバータ編）</h3>
-            <div class="grid-2">
-                <div class="card">
-                    <h3>Smart and Practical <span class="model-number">LUXA1680</span></h3>
-                    <table class="feature-table">
-                        <tr><th>チャンネル数</th><td>16 ch</td></tr>
-                        <tr><th>サンプリングレート</th><td>80M sps</td></tr>
-                        <tr><th>消費電力</th><td>0.9W</td></tr>
-                    </table>
-                    <p style="margin-top: 15px;">カメラを小型に設計したい場合に適した、電力効率の良い実用的な外部ADコンバータ。</p>
+        <section id="qa-3">
+            <h2 class="section-title">【技術原理】ADコンバータの本質と配置問題（フードコート vs メガスタジアム）</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            お兄さん、<strong>すべてのカメラはアナログからデジタルに変えている（AD変換している）んですよね？</strong> なんでこのチラシには別々に製品が載っているんですか？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            鋭い！<strong>「置き場所の違い」</strong>だよ。確かにすべてAD変換しているけれど、スマホは<strong>『フードコート』</strong>なんだ。チップの中に『光を受ける部分（料理人）』も『レジ（ADコンバータ）』も全部一緒に入っている。線の距離が短いから効率が良くて小さくて便利なんだ。
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            ラクシマの高速センサーはどう違うの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            高速センサーは数万人もの客が押し寄せる<strong>『メガスタジアム』</strong>だ。チップの中にレジ（ADコンバータ）を置くと、処理が詰まってレジがパンクしちゃう！だから、チップの外側に「超高性能な自動改札レジ（別売ADコンバータ）」を並べて、膨大なデータをドカンと送り出すんだよ。
+                        </div>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Mega Monster Register <span class="model-number">LUXA3280</span></h3>
-                    <table class="feature-table">
-                        <tr><th>チャンネル数</th><td>32 ch</td></tr>
-                        <tr><th>サンプリングレート</th><td>90M sps</td></tr>
-                        <tr><th>消費電力</th><td>2.5W</td></tr>
-                    </table>
-                    <p style="margin-top: 15px;">1秒間に9000万回の処理を行う超高速モデル。超大量データの処理が必要な、限界パワーを引き出す用途に。</p>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <img src="image_2.png" alt="ADコンバータ型番別の特徴と解説（分解能、チャンネル数）">
-            </div>
-
-        </div>
-    </section>
-
-    <section id="impact" style="background-color: #fff;">
-        <div class="container">
-            <h2 class="section-title">【産業的インパクト】目に見えない一瞬を世界へ</h2>
-            <div class="grid-3">
-                <div class="card">
-                    <img src="image_2.png" alt="工場キズチェック（イメージ）" style="cursor: default;">
-                    <h3>工場のキズチェック</h3>
-                    <p>超高速ラインを流れる製品をVGA解像度・数千fpsで撮影し、人間の目では捉えられない微細な欠陥をリアルタイムに自動検知。</p>
-                </div>
-                <div class="card">
-                    <img src="image_2.png" alt="自動車衝突実験（イメージ）" style="cursor: default;">
-                    <h3>衝突実験スローモーション</h3>
-                    <p>Full HD解像度・1000fps以上の撮影により、車体が潰れる複雑な物理挙動を詳細に解析し、安全性の向上に貢献。</p>
-                </div>
-                <div class="card">
-                    <img src="image_2.png" alt="大学の研究（イメージ）" style="cursor: default;">
-                    <h3>大学の先端研究</h3>
-                    <p>激しい化学反応、爆発現象、弾丸の挙動などを極限のスピードと集光力で捉え、物理法則の解明や新素材開発を支援。</p>
+                <div class="tech-panel">
+                    <div>
+                        <h4>構造的アプローチ：外側に置く2つのメリット</h4>
+                        <p><strong>メリット①：熱を逃がせる</strong><br>AD変換回路は高周波動作を行うため、消費電力および発熱量が非常に大きくなります。これをセンサ素子と同一ダイ（オンチップ）に集積すると熱が籠もり、センサの暗電流ノイズ（熱ノイズ）を劇的に増大させます。外部に分離することでセンサを低温に保ち、ノイズを回避します。</p>
+                        <p><strong>メリット②：スピードを限界まで引き出せる</strong><br>外部に独立した専用の高速ADコンバータ（スピードキング）を配置することで、チップサイズ制限から解放され、並列チャネル数およびサンプリングレートを物理的限界まで高めることが可能になります。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="lux4.png" alt="オンチップADコンバータと外部ADコンバータの配置における熱・帯域シミュレーション" class="zoomable-image">
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section id="qa-4">
+            <h2 class="section-title">【製品仕様】6人の個性派アスリートと2人の天才通訳</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            型番ごとの個性や、ADコンバータの「通訳」としてのパワーの違いも知りたいです！
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            よし、各特性をデータシートの数値ベースで網羅して紹介するね。
+                            <div class="thought-quote">
+                                <strong>■ イメージセンサー群の特徴：</strong><br>
+                                ・<strong>LUX8M (Balanced Ace)</strong>：8.5MP（約850万画素）の高画質を維持したまま、250fpsを達成。高精細かつ速度バランスに優れたエース。<br>
+                                ・<strong>LUX2100 (Full HD Speedster)</strong>：2.1MP（フルHD画素）。1000fpsの大台を達成しつつ、10&micro;mの大きめな画素サイズで低照度下にも対応。<br>
+                                ・<strong>LUX1310 & LUX1310S (Twin Pairs)</strong>：どちらも1.3MP（約130万画素）。1310は1070fpsのハイスペック実力派、1310Sは267fpsの省エネ・コンパクト版。<br>
+                                ・<strong>LUX330 (Explosive Speed King)</strong>：0.33MP（約33万画素）と画素数を抑える代わりに、4168fpsという圧倒的な爆発的スピードを実現。<br>
+                                ・<strong>LUX13HS (Dark Hunter)</strong>：1.1MP（約110万画素）、3500fps。画素サイズが13.7&micro;mと最大で集光力が極めて高く、暗室でも鮮明に撮影可能。
+                            </div>
+                            <div class="thought-quote">
+                                <strong>■ ADコンバータ群の特徴：</strong><br>
+                                ・<strong>LUXA1680 (Smart and Practical)</strong>：チャンネル数「16 ch」、サンプリングレート「80M sps」。消費電力「0.9W」。1秒間に8000万回の量子化ペース。カメラを小型化したい場合に最適。<br>
+                                ・<strong>LUXA3280 (Mega Monster Register)</strong>：チャンネル数「32 ch」、サンプリングレート「90M sps」。消費電力「2.5W」。窓口を2倍の32列に広げ、1秒間に9000万回処理する超大量データ処理の相棒。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>分解能・サンプリングの物理解説</h4>
+                        <p>外部ADコンバータは、高速センサから超並列で出力されるアナログ電圧を、高ビット（例：12ビット＝4096段階）のきめ細かさでデジタルに変換（通訳）します。チャンネル数（ch）はパラレル処理の受付窓口数、サンプリングレート（sps）は1秒あたりの測定回数を示します。</p>
+                        <p>LUX330のような「スピード狂」のセンサが叩き出す膨大なデータを破綻なくデジタル化するには、LUXA3280のような多チャネル・高spsの外部コンポーネントが論理的に不可欠となります。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="lux5.png" alt="個性派アスリート（センサー）と天才通訳（ADコンバータ）の性能一覧" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="qa-5">
+            <h2 class="section-title">【産業的インパクト】この技術が社会を支える現場</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👦</div>
+                        <div class="bubble">
+                            <span class="speaker-name">キミ</span>
+                            なるほど！目に見えないくらい一瞬の世界をスローモーションで見るための、日本の産業や研究を支えるすごい部品たちだったんですね！
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">エンジニア</span>
+                            その通り。例えば、以下のような過酷かつ超高速な環境で、この「センサと別売りADコンバータ」のコンビネーションが極限のパワーを発揮しているんだ。
+                            <ul class="tech-list">
+                                <li><strong>工場のキズチェック：</strong> 高速で移動する製品ラインの微細な欠陥を、遅延やブレなく正確に検知。</li>
+                                <li><strong>自動車衝突実験スローモーション分析：</strong> ミリ秒単位で発生するエアバッグの展開や車体の変形挙動を完全にホールド。</li>
+                                <li><strong>大学の研究（激しい化学反応）：</strong> 爆発や超高速な結晶構造変化など、極短時間の物理・化学現象の可視化。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>結論：コンポーネント分離による最適最適化</h4>
+                        <p>超高速撮影において、「イメージセンサ（光電変換素子）」と「ADコンバータ（量子化回路）」を物理的に分離・独立させる設計思想は、熱力学（発熱・ノイズ）と電気工学（帯域・スループット）のトレードオフを克服するための最も合理的なソリューションです。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="lux3.png" alt="高速イメージングの分解能解説と3大産業応用分野" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <article class="editorial-note">
+            <strong>【技術広報ノート】</strong><br>
+            高速CMOSイメージセンサにおける「オンチップAD」と「外部配置AD」の選択は、単なるアーキテクチャの違いではなく、対象とする物理現象のスケールによって決定される工学的帰結です。熱源の完全分離とパラレルデータバスの確保により、はじめて4000fpsを超える極限の世界の可視化が担保されます。
+        </article>
+
+    </main>
 
     <footer style="background: #091a2d; color: #fff; padding: 60px 20px; text-align: center;">
         <div class="footer-info">
@@ -731,53 +622,46 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const images = document.querySelectorAll('img');
-            const overlay = document.getElementById('zoom-overlay');
+            const images = document.querySelectorAll('.zoomable-image');
+            const overlay = document.getElementById('zoomOverlay');
 
-            // 必須規定: 全ての img に適用
             images.forEach(img => {
-                // インラインスタイルによる規定の初期CSS適用（PromptではCSSとして記述されていたが、JSでの制御を確実にするため）
-                img.style.transition = 'all 0.3s ease';
-                img.style.cursor = 'zoom-in';
-
                 img.addEventListener('click', function(e) {
-                    // 拡大表示されていない場合、拡大する
                     if (!this.classList.contains('zoomed')) {
-                        // 他の拡大されている画像をリセット（1枚のみ拡大）
-                        resetZoom();
+                        // 他に拡大されている画像があればリセット
+                        images.forEach(i => {
+                            i.classList.remove('zoomed');
+                            i.style.cursor = 'zoom-in';
+                        });
                         
                         this.classList.add('zoomed');
                         overlay.classList.add('active');
-                        // 必須規定: 拡大時は cursor: zoom-out
                         this.style.cursor = 'zoom-out';
-                        e.stopPropagation(); // 親要素へのクリック伝播を防ぐ
-                    } 
-                    // すでに拡大されている場合、縮小する（トグル機能）
-                    else {
-                        resetZoom();
+                        e.stopPropagation();
+                    } else {
+                        hideZoom();
                     }
                 });
             });
 
-            // オーバーレイまたは拡大画像をクリックで縮小
-            overlay.addEventListener('click', resetZoom);
-            window.addEventListener('click', resetZoom); // 画面外クリックでもリセット
-            
-            // エスケープキーでリセット
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    resetZoom();
+            overlay.addEventListener('click', hideZoom);
+            document.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('zoomable-image')) {
+                    hideZoom();
                 }
             });
 
-            // ズーム状態をリセットする関数
-            function resetZoom() {
-                const zoomedImg = document.querySelector('img.zoomed');
-                if (zoomedImg) {
-                    zoomedImg.classList.remove('zoomed');
-                    // 必須規定: 縮小時は cursor: zoom-in
-                    zoomedImg.style.cursor = 'zoom-in';
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideZoom();
                 }
+            });
+
+            function hideZoom() {
+                images.forEach(img => {
+                    img.classList.remove('zoomed');
+                    img.style.cursor = 'zoom-in';
+                });
                 overlay.classList.remove('active');
             }
         });
