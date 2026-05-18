@@ -716,6 +716,71 @@
             </div>
         </section>
 
+
+        <section id="qa-5">
+            <h2 class="section-title">第4章：最大の弱点？「撮ったデータの保存」はどうするの？</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            うん、めちゃくちゃよく分かった！お兄さん、ありがとう！……あ、でもさ、これだけすごい超高速センサーとバケモノADコンバータが合体して、1秒間に4000枚も写真が撮れるのは分かったんだけど……
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            うんうん、どうしたの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            カメラのシャッターを押したその一瞬だけで、ノートパソコンのハードディスク、一発でパンパンになってデータ書き込み追いつかなくない？ <strong>撮った動画、どこにどうやって保存するの？</strong>
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            ……。
+                            <div class="thought-quote">
+                                <strong>サトウ（エンジニアの心の声）：</strong><br>
+                                （あ……。一番突っ込まれたくない『超高速カメラは、撮影ボタンを押した瞬間に数秒でメモリがいっぱいになって、そのあとの保存にめちゃくちゃ時間がかかる』っていう、システム全体の最大の弱点（ボトルネック）を一瞬で見抜かれた……！）
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            お兄さん？急に黙ってどうしたの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            ……キミ、将来うちの会社にインターンシップ（就職体験）来ない？
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>技術原理の解説（高速データ転送と記録ボトルネック）</h4>
+                        <p style="margin-top: 10px;">超高速・高解像度イメージングにおいて、センサーから毎秒出力されるテラビット級の生データ（Raw data）は、一般的なSSDやHDDの書き込み速度を遙かに超越します。</p>
+                        <p style="margin-top: 10px;">このため、システムはカメラ内部に大容量・超高速の「一時記録用専用DRAMバッファ」を搭載し、数秒間のバースト撮影データを一度すべてメモリにスタックします。その後、バックグラウンド処理で低速な恒久ストレージへとシーケンシャル転送するパイプライン設計が採用されていますが、この「メモリ容量による撮影時間の制限」と「転送待ち時間（ボトルネック）」の解消が組み込み設計における重要な課題となっています。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="censor5.png" alt="高速センサー、DRAMバッファメモリ、ストレージ間におけるデータ転送レートのボトルネック概念図" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <article class="editorial-note">
             <strong>【技術広報ノート】</strong><br>
             高速CMOSイメージセンサにおける「オンチップAD」と「外部配置AD」の選択は、単なるアーキテクチャの違いではなく、対象とする物理現象のスケールによって決定される工学的帰結です。熱源の完全分離とパラレルデータバスの確保により、はじめて4000fpsを超える極限の世界の可視化が担保されます。
